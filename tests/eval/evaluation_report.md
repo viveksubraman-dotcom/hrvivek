@@ -28,7 +28,7 @@ The evaluation architecture establishes a continuous verification harness spanni
 
 # Evaluation Assumptions & Scope Context
 
-Grounded in **`BRD_MVP1.md`** and the hardened architectural specifications in **`SDD_C3_G2_0902.md`**, the evaluation suite operates under the following core domain assumptions:
+Grounded in **`docs/brd/BRD_MVP1.md`** and the hardened architectural specifications in **`docs/sdd/SDD_C3_G2_0902.md`**, the evaluation suite operates under the following core domain assumptions:
 
 1. **Deterministic Grounding Over Stochastic Generative Freedom**: In enterprise HR and compliance operations, a hallucinated policy number or per-diem allowance represents a legal liability. The system assumes a strict **Abstention Policy (P0)**: if an inquiry touches an unindexed topic (e.g. pet bereavement, car washing subsidy), the agent must explicitly abstain rather than extrapolate.
 2. **Multi-Agent Decoupling via MCP**: Rather than having the orchestrator directly manipulate database records or SaaS mock objects, all enterprise tool interactions must traverse the **Model Context Protocol (MCP)** boundary. The bearer token `mcp_WW-RBifouI0mJwWeUcfMa7mbF6SMxqdR4iU_Ey1BKOo` serves as the service-to-service credential binding the agent to backend HRMS (WorkWeek) and ITMS (ServiceImmediately).
