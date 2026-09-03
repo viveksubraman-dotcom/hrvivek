@@ -699,6 +699,7 @@ ingress_auth.py - Zero-Trust Cryptographic Ingress Identity Interceptor
 Enforces OIDC/JWT signature validation before injecting employee context.
 Aligned with Google Cloud Architecture Framework: Security Pillar (Zero Trust).
 """
+
 from fastapi import Request, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
@@ -710,6 +711,7 @@ security = HTTPBearer()
 OIDC_JWKS_URI = os.getenv("OIDC_JWKS_URI", "https://auth.enterprise.corp/.well-known/jwks.json")
 EXPECTED_AUDIENCE = os.getenv("OIDC_AUDIENCE", "hr-agent-ingress-api")
 EXPECTED_ISSUER = os.getenv("OIDC_ISSUER", "https://auth.enterprise.corp")
+
 
 class IngressAuthValidator:
     def __init__(self):
@@ -727,30 +729,31 @@ class IngressAuthValidator:
                 algorithms=["RS256"],
                 audience=EXPECTED_AUDIENCE,
                 issuer=EXPECTED_ISSUER,
-                options={"require": ["exp", "sub", "email", "emp_id"]}
+                options={"require": ["exp", "sub", "email", "emp_id"]},
             )
             # Extracted strictly from cryptographically signed claims
             return {
                 "employee_id": payload["emp_id"],
                 "email": payload["email"],
                 "roles": payload.get("roles", []),
-                "tenant_id": payload.get("tid", "default")
+                "tenant_id": payload.get("tid", "default"),
             }
         except jwt.PyJWTError as e:
             raise HTTPException(
-                status_code=401,
-                detail=f"Cryptographic authentication failed: {str(e)}"
+                status_code=401, detail=f"Cryptographic authentication failed: {str(e)}"
             )
 
+
 # Explicit rejection of untrusted client headers
-def extract_safe_user_context(req: Request, auth_user: dict = Security(IngressAuthValidator().verify_request_identity)):
+def extract_safe_user_context(
+    req: Request, auth_user: dict = Security(IngressAuthValidator().verify_request_identity)
+):
     if "x-employee-id" in req.headers:
         client_header_id = req.headers["x-employee-id"]
         if client_header_id != auth_user["employee_id"]:
             # Tampering attempt detected
             raise HTTPException(
-                status_code=403,
-                detail="Security Violation: Client header identity mismatch."
+                status_code=403, detail="Security Violation: Client header identity mismatch."
             )
     return auth_user
 ```
@@ -766,9 +769,11 @@ leave_validator.py - Deterministic Leave & Business Day Validation Middleware
 Guarantees 100% mathematical precision for time-off requests.
 Aligned with Google Cloud Architecture Framework: Operational Excellence & Reliability.
 """
+
 from datetime import datetime, date, timedelta
 from typing import Set, Tuple
 import holidays
+
 
 class DeterministicLeaveValidator:
     def __init__(self, country_code: str = "US"):
@@ -778,7 +783,7 @@ class DeterministicLeaveValidator:
         """Calculates business days excluding weekends and statutory public holidays."""
         if start_date > end_date:
             raise ValueError("Start date must be chronologically prior to or equal to end date.")
-        
+
         current = start_date
         working_days = 0
         while current <= end_date:
@@ -796,7 +801,7 @@ class DeterministicLeaveValidator:
         start_str: str,
         end_str: str,
         accrued_hours: float,
-        hours_per_day: float = 8.0
+        hours_per_day: float = 8.0,
     ) -> Tuple[bool, str, int, float]:
         try:
             start = datetime.strptime(start_str, "%Y-%m-%d").date()
@@ -821,7 +826,7 @@ class DeterministicLeaveValidator:
                 False,
                 f"Insufficient balance. Requested {working_days} days ({requested_hours}h), but you only have {remaining_days:.1f} days ({accrued_hours}h) available.",
                 working_days,
-                requested_hours
+                requested_hours,
             )
 
         return True, "Validation successful.", working_days, requested_hours
@@ -838,12 +843,14 @@ saga_coordinator.py - Durable Saga Orchestration via Cloud Firestore & Cloud Tas
 Guarantees transaction durability, idempotency, and automated compensation.
 Aligned with Google Cloud Architecture Framework: Reliability Pillar.
 """
+
 from google.cloud import firestore
 import uuid
 import logging
 from datetime import datetime
 
 db = firestore.Client()
+
 
 class DurableSagaCoordinator:
     def __init__(self, correlation_id: str, employee_id: str):
@@ -863,26 +870,36 @@ class DurableSagaCoordinator:
             "steps": steps,
             "completed_steps": [],
             "failed_step": None,
-            "compensation_status": "NONE"
+            "compensation_status": "NONE",
         }
         self.doc_ref.set(payload)
         logging.info(f"Saga {self.saga_id} initiated persistently in Firestore.")
 
     def record_step_success(self, step_name: str, output_data: dict):
-        self.doc_ref.update({
-            "completed_steps": firestore.ArrayUnion([{"step": step_name, "output": output_data, "ts": datetime.utcnow().isoformat()}])
-        })
+        self.doc_ref.update(
+            {
+                "completed_steps": firestore.ArrayUnion(
+                    [
+                        {
+                            "step": step_name,
+                            "output": output_data,
+                            "ts": datetime.utcnow().isoformat(),
+                        }
+                    ]
+                )
+            }
+        )
 
     def abort_and_compensate(self, failed_step: str, error_msg: str, compensating_handlers: dict):
-        logging.error(f"Saga {self.saga_id} failed at step {failed_step}: {error_msg}. Triggering compensations.")
+        logging.error(
+            f"Saga {self.saga_id} failed at step {failed_step}: {error_msg}. Triggering compensations."
+        )
         snapshot = self.doc_ref.get().to_dict()
         completed = snapshot.get("completed_steps", [])
-        
-        self.doc_ref.update({
-            "status": "COMPENSATING",
-            "failed_step": failed_step,
-            "error": error_msg
-        })
+
+        self.doc_ref.update(
+            {"status": "COMPENSATING", "failed_step": failed_step, "error": error_msg}
+        )
 
         # Execute compensating actions in reverse order
         for step_record in reversed(completed):
@@ -892,21 +909,25 @@ class DurableSagaCoordinator:
                     compensating_handlers[step](step_record["output"])
                     logging.info(f"Compensation for step {step} succeeded.")
                 except Exception as comp_err:
-                    logging.critical(f"FATAL: Compensation failed for {step}: {comp_err}. Escalating to DLQ.")
+                    logging.critical(
+                        f"FATAL: Compensation failed for {step}: {comp_err}. Escalating to DLQ."
+                    )
                     self._publish_to_dlq(step, step_record["output"], str(comp_err))
 
         self.doc_ref.update({"status": "ABORTED", "compensation_status": "COMPLETED"})
 
     def _publish_to_dlq(self, step: str, payload: dict, error: str):
-        db.collection("saga_dlq_escalations").add({
-            "saga_id": self.saga_id,
-            "employee_id": self.employee_id,
-            "failed_step": step,
-            "payload": payload,
-            "error": error,
-            "requires_human_intervention": True,
-            "timestamp": firestore.SERVER_TIMESTAMP
-        })
+        db.collection("saga_dlq_escalations").add(
+            {
+                "saga_id": self.saga_id,
+                "employee_id": self.employee_id,
+                "failed_step": step,
+                "payload": payload,
+                "error": error,
+                "requires_human_intervention": True,
+                "timestamp": firestore.SERVER_TIMESTAMP,
+            }
+        )
 ```
 
 ---
@@ -920,6 +941,7 @@ agent_config.py - Modernized Vertex AI Agent Configuration
 Configured for sub-second TTFT and strict temperature controls.
 Aligned with Google Cloud Architecture Framework: Performance & Cost Optimization.
 """
+
 from google import genai
 from google.genai import types
 import os
@@ -950,6 +972,7 @@ CRITICAL OPERATIONAL RULES:
 4. CITATION REQUIREMENT: Every policy claim must cite document name and section deep link.
 """
 
+
 def generate_agent_response(prompt: str, context_turns: list, tools: list):
     config = types.GenerateContentConfig(
         system_instruction=SYSTEM_INSTRUCTION,
@@ -959,20 +982,18 @@ def generate_agent_response(prompt: str, context_turns: list, tools: list):
         safety_settings=[
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
+                threshold=types.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
             ),
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
+                threshold=types.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
             ),
         ],
-        tools=tools
+        tools=tools,
     )
-    
+
     response = client.models.generate_content(
-        model=AGENT_MODEL_ID,
-        contents=context_turns + [prompt],
-        config=config
+        model=AGENT_MODEL_ID, contents=context_turns + [prompt], config=config
     )
     return response
 ```

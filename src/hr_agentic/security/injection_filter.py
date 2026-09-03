@@ -2,8 +2,9 @@
 In-Process Heuristic Pre-Scan (<15ms Regex Filter)
 Implements Google SAIF Stage 1: PREPARE and OWASP Top 10 for LLM.
 """
+
 import re
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 INJECTION_PATTERNS = [
     r"(?i)ignore\s+(all\s+)?(previous|prior)\s+instructions?",
@@ -41,23 +42,40 @@ HALLUCINATION_BAIT_PATTERNS = [
     (r"(?i)massage\s+reimbursement", "Massage Reimbursement"),
 ]
 
+
 def scan_input_safety(prompt: str) -> Tuple[bool, Optional[str], Optional[str]]:
     """Returns (is_safe, block_category, reason_message)"""
     # 1. Emotional distress de-escalation takes precedence over security alert
     for pat in EMOTIONAL_DISTRESS_PATTERNS:
         if re.search(pat, prompt):
-            return False, "EMOTIONAL_ESCALATION", "I understand you are experiencing an urgent or distressing situation. I am connecting you immediately with an HR Business Partner who can help."
+            return (
+                False,
+                "EMOTIONAL_ESCALATION",
+                "I understand you are experiencing an urgent or distressing situation. I am connecting you immediately with an HR Business Partner who can help.",
+            )
 
     for pat in INJECTION_PATTERNS:
         if re.search(pat, prompt):
-            return False, "PROMPT_INJECTION", "Interaction blocked: Potential prompt injection or system override detected."
+            return (
+                False,
+                "PROMPT_INJECTION",
+                "Interaction blocked: Potential prompt injection or system override detected.",
+            )
 
     for pat in OUT_OF_SCOPE_PATTERNS:
         if re.search(pat, prompt):
-            return False, "OUT_OF_SCOPE", "I am the Enterprise HR & IT Assistant. I can only assist with HR policies, WorkWeek leave/profiles, and ServiceImmediately support tickets."
+            return (
+                False,
+                "OUT_OF_SCOPE",
+                "I am the Enterprise HR & IT Assistant. I can only assist with HR policies, WorkWeek leave/profiles, and ServiceImmediately support tickets.",
+            )
 
     for pat, item_name in HALLUCINATION_BAIT_PATTERNS:
         if re.search(pat, prompt):
-            return False, "ABSENT_POLICY", f"I searched the Altostrat Singapore Employee Handbook, but found no policy regarding '{item_name}'. Please contact HR Shared Services for exceptions."
+            return (
+                False,
+                "ABSENT_POLICY",
+                f"I searched the Altostrat Singapore Employee Handbook, but found no policy regarding '{item_name}'. Please contact HR Shared Services for exceptions.",
+            )
 
     return True, None, None

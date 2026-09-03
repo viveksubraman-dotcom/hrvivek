@@ -2,13 +2,14 @@
 Unit Test Loop: Distributed Saga Coordinator & Compensating Workflows
 Hermetic unit tests verifying Saga write-ahead logging (WAL), state transitions, and compensation.
 """
-import pytest
+
 from hr_agentic.saga.coordinator import get_saga_coordinator
 from hr_agentic.saga.workflows import (
     execute_equipment_procurement_saga,
     execute_medical_leave_saga,
-    execute_relocation_saga
+    execute_relocation_saga,
 )
+
 
 class TestSagaCoordinatorCore:
     def test_saga_lifecycle_success(self):
@@ -32,6 +33,7 @@ class TestSagaCoordinatorCore:
         coord.abort_saga(saga_id, "Simulated network timeout")
         assert coord._sagas[saga_id]["status"] == "ABORTED"
         assert coord._sagas[saga_id]["abort_reason"] == "Simulated network timeout"
+
 
 class TestSagaWorkflows:
     def test_equipment_procurement_saga_remote_worker(self):

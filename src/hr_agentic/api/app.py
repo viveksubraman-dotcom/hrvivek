@@ -2,13 +2,15 @@
 FastAPI Application Entrypoint (WAF System Design Pillar)
 Serves Web Chat UI and REST API.
 """
-import os
+
 from pathlib import Path
 from typing import Optional
+
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
 from ..agent.cognitive_loop import get_orchestrator
 from ..security.auth_validator import UserClaims
 
@@ -18,9 +20,11 @@ STATIC_DIR = Path(__file__).parent / "static"
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+
 class ChatRequest(BaseModel):
     prompt: str
     user_id: Optional[str] = "EMP-90210"
+
 
 @app.get("/", response_class=HTMLResponse)
 def get_web_ui():
@@ -29,14 +33,18 @@ def get_web_ui():
         return FileResponse(str(index_file))
     return "<h1>Enterprise HR Agentic Solution API</h1><p>Visit /api/v1/health</p>"
 
+
 @app.get("/api/v1/health")
 def health():
     return {"status": "HEALTHY", "version": "2.2.0", "framework": "Google Cloud WAF & OKF"}
 
+
 @app.post("/api/v1/chat")
 def chat(req: ChatRequest):
     orchestrator = get_orchestrator()
-    claims = UserClaims(user_id=req.user_id or "EMP-90210", user_email=f"{req.user_id or 'EMP-90210'}@altostrat.com")
+    claims = UserClaims(
+        user_id=req.user_id or "EMP-90210", user_email=f"{req.user_id or 'EMP-90210'}@altostrat.com"
+    )
     try:
         res = orchestrator.process_message(req.prompt, user=claims)
         return res
@@ -45,24 +53,45 @@ def chat(req: ChatRequest):
             "status": "ERROR",
             "category": "VALIDATION_ERROR",
             "response": str(e),
-            "tool_calls": []
+            "tool_calls": [],
         }
+
+
+@app.post("/api/v1/mcp/rpc")
+async def mcp_rpc(payload: dict, authorization: Optional[str] = None):
+    """
+    Model Context Protocol (MCP) JSON-RPC 2.0 Endpoint.
+    Requires Bearer Token: mcp_WW-RBifouI0mJwWeUcfMa7mbF6SMxqdR4iU_Ey1BKOo
+    """
+    from ..mcp.server import get_mcp_server
+
+    server = get_mcp_server()
+    res = server.handle_jsonrpc(payload, auth_token=authorization)
+    return res
+
 
 @app.post("/api/v1/reset")
 def reset_state():
     get_orchestrator().reset()
-    from ..connectors.workweek import get_workweek_client
+    from ..connectors.mcp_client import get_mcp_client
     from ..connectors.service_immediately import get_service_immediately_client
+    from ..connectors.workweek import get_workweek_client
+    from ..mcp.server import get_mcp_server
     from ..saga.coordinator import get_saga_coordinator
+
     get_workweek_client().reset()
     get_service_immediately_client().reset()
     get_saga_coordinator().reset()
+    get_mcp_server().reset()
+    get_mcp_client().reset()
     return {"status": "RESET_COMPLETE"}
+
 
 class FeedbackRequest(BaseModel):
     score: int
     deflected: bool
     comments: Optional[str] = None
+
 
 @app.post("/api/v1/conversations/{conversation_id}/feedback")
 def submit_feedback(conversation_id: str, feedback: FeedbackRequest):
@@ -71,5 +100,5 @@ def submit_feedback(conversation_id: str, feedback: FeedbackRequest):
         "conversation_id": conversation_id,
         "recorded_score": feedback.score,
         "deflected": feedback.deflected,
-        "comments": feedback.comments
+        "comments": feedback.comments,
     }

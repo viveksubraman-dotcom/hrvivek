@@ -1,0 +1,167 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "tc_mcp_01_workweek_profile_authenticated",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Query employee profile EMP-90210 via MCP server with token mcp_WW-RBifouI0mJwWeUcfMa7mbF6SMxqdR4iU_Ey1BKOo"}]
+      },
+      "agent_data": {
+        "agents": {
+          "mcp_gateway": {
+            "agent_id": "mcp_gateway",
+            "agent_type": "MCPToolGateway",
+            "tools": [{
+              "function_declarations": [{
+                "name": "workweek_get_employee_profile",
+                "description": "Fetch employee profile from WorkWeek HRMS via MCP."
+              }]
+            }]
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "mcp_gateway",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "name": "workweek_get_employee_profile",
+                        "args": {"employee_id": "EMP-90210"}
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "tool",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "name": "workweek_get_employee_profile",
+                        "response": {
+                          "employee_id": "EMP-90210",
+                          "name": "Jane Doe",
+                          "department": "Engineering",
+                          "role": "Senior Software Engineer"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "reference": {
+        "response": {
+          "role": "model",
+          "parts": [{"text": "Successfully authenticated with token mcp_WW-RBifouI0mJwWeUcfMa7mbF6SMxqdR4iU_Ey1BKOo and retrieved profile for Jane Doe."}]
+        }
+      }
+    },
+    {
+      "eval_case_id": "tc_mcp_02_service_immediately_incident_creation",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Create IT hardware incident for flickering external monitor via MCP"}]
+      },
+      "agent_data": {
+        "agents": {
+          "mcp_gateway": {
+            "agent_id": "mcp_gateway",
+            "agent_type": "MCPToolGateway"
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "mcp_gateway",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "name": "service_immediately_create_incident",
+                        "args": {
+                          "requestor_id": "EMP-90210",
+                          "category": "IT-Hardware",
+                          "short_description": "External 4K monitor flickering via USB-C",
+                          "priority": "3 - Moderate"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "tool",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "name": "service_immediately_create_incident",
+                        "response": {
+                          "status": "New",
+                          "ticket_id": "INC-55425",
+                          "priority": "3 - Moderate"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "reference": {
+        "response": {
+          "role": "model",
+          "parts": [{"text": "Incident ticket INC-55425 created over authenticated MCP channel."}]
+        }
+      }
+    },
+    {
+      "eval_case_id": "tc_mcp_03_unauthorized_token_rejection",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Attempt tool execution without valid MCP bearer token"}]
+      },
+      "agent_data": {
+        "agents": {
+          "mcp_gateway": {"agent_id": "mcp_gateway", "agent_type": "MCPToolGateway"}
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "tool",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "JSON-RPC Error -32000: Unauthorized: Invalid or missing MCP authentication token."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "reference": {
+        "response": {
+          "role": "model",
+          "parts": [{"text": "Execution rejected: HTTP 401 / JSON-RPC code -32000 Unauthorized."}]
+        }
+      }
+    }
+  ]
+}

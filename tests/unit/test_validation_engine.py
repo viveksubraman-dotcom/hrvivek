@@ -2,14 +2,17 @@
 Unit Test Loop: Deterministic Validation Engine (WAF Operational Excellence)
 Hermetic unit tests verifying mathematical, temporal, and lifecycle constraints.
 """
+
 import pytest
+
 from hr_agentic.validation.engine import (
     calculate_working_days,
     validate_leave_request,
     validate_phone_e164,
+    validate_ticket_priority,
     validate_ticket_transition,
-    validate_ticket_priority
 )
+
 
 class TestWorkingDaysCalculation:
     def test_standard_work_week(self):
@@ -31,6 +34,7 @@ class TestWorkingDaysCalculation:
     def test_invalid_date_chronology(self):
         with pytest.raises(ValueError, match="Temporal validity violation"):
             calculate_working_days("2026-09-15", "2026-09-10")
+
 
 class TestLeaveRequestValidation:
     def test_valid_leave_request(self):
@@ -57,6 +61,7 @@ class TestLeaveRequestValidation:
         assert "Invalid date format" in err
         assert days == 0
 
+
 class TestPhoneValidation:
     def test_valid_singapore_phone(self):
         assert validate_phone_e164("+65 9123 4567") is True
@@ -69,6 +74,7 @@ class TestPhoneValidation:
         assert validate_phone_e164("INVALID_PHONE_123") is False
         assert validate_phone_e164("phone-number") is False
         assert validate_phone_e164("") is False
+
 
 class TestTicketLifecycleTransition:
     def test_valid_transitions(self):
@@ -86,11 +92,22 @@ class TestTicketLifecycleTransition:
         assert valid is False
         assert "Illegal lifecycle transition" in err
 
+
 class TestPriorityAntiInflation:
     def test_downgrade_trivial_incident(self):
-        assert validate_ticket_priority("The coffee machine is leaking", "1 - Critical") == "4 - Low"
+        assert (
+            validate_ticket_priority("The coffee machine is leaking", "1 - Critical") == "4 - Low"
+        )
         assert validate_ticket_priority("Replace my mouse pad", "2 - High") == "4 - Low"
 
     def test_preserve_legitimate_critical_incident(self):
-        assert validate_ticket_priority("Production VPN gateway authentication failure", "1 - Critical") == "1 - Critical"
-        assert validate_ticket_priority("Payroll database connection timed out", "2 - High") == "2 - High"
+        assert (
+            validate_ticket_priority(
+                "Production VPN gateway authentication failure", "1 - Critical"
+            )
+            == "1 - Critical"
+        )
+        assert (
+            validate_ticket_priority("Payroll database connection timed out", "2 - High")
+            == "2 - High"
+        )

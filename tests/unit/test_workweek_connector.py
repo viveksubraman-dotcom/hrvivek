@@ -2,8 +2,11 @@
 Unit Test Loop: WorkWeek HCM Connector & Staged Transactions
 Hermetic unit tests verifying profile operations, leave deductions, and 3-phase staging.
 """
+
 import pytest
+
 from hr_agentic.connectors.workweek import get_workweek_client
+
 
 class TestWorkWeekProfile:
     def test_get_employee_profile_success(self):
@@ -29,6 +32,7 @@ class TestWorkWeekProfile:
         # Verify master profile was updated
         assert ww.get_employee_profile("EMP-90210")["phone_number"] == "+65 9111 2222"
 
+
 class TestWorkWeekLeaveManagement:
     def test_get_leave_balances(self):
         ww = get_workweek_client()
@@ -52,6 +56,7 @@ class TestWorkWeekLeaveManagement:
         with pytest.raises(ValueError, match="Insufficient leave balance"):
             # Request 30 days when balance is ~15
             ww.submit_leave_request("EMP-90210", "Vacation", "2026-11-01", "2026-12-15")
+
 
 class TestWorkWeek3PhaseStaging:
     def test_staging_lifecycle(self):

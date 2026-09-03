@@ -2,9 +2,11 @@
 Durable Distributed Saga Coordinator (Cloud Firestore WAL Simulation)
 Implements 2-Phase staging, idempotent execution, and compensating rollbacks (SDD Section 5.5).
 """
+
 import uuid
-from typing import Dict, Any, List
 from datetime import datetime, timezone
+from typing import Any, Dict
+
 
 class SagaCoordinator:
     def __init__(self):
@@ -18,19 +20,28 @@ class SagaCoordinator:
             "user_id": user_id,
             "status": "INITIATED",
             "steps": [],
-            "created_at": datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }
         return saga_id
 
-    def log_step(self, saga_id: str, step_name: str, system: str, payload: Dict[str, Any], status: str = "COMPLETED"):
+    def log_step(
+        self,
+        saga_id: str,
+        step_name: str,
+        system: str,
+        payload: Dict[str, Any],
+        status: str = "COMPLETED",
+    ):
         if saga_id in self._sagas:
-            self._sagas[saga_id]["steps"].append({
-                "step_name": step_name,
-                "system": system,
-                "payload": payload,
-                "status": status,
-                "timestamp": datetime.now(timezone.utc).isoformat()
-            })
+            self._sagas[saga_id]["steps"].append(
+                {
+                    "step_name": step_name,
+                    "system": system,
+                    "payload": payload,
+                    "status": status,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+            )
             self._sagas[saga_id]["status"] = f"STEP_{step_name}_{status}"
 
     def commit_saga(self, saga_id: str):
@@ -45,6 +56,9 @@ class SagaCoordinator:
     def reset(self):
         self._sagas.clear()
 
+
 _coordinator = SagaCoordinator()
+
+
 def get_saga_coordinator() -> SagaCoordinator:
     return _coordinator

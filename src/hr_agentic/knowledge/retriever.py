@@ -2,8 +2,11 @@
 OKF Tri-Hybrid Search Brain & Policy Retrieval Engine (SDD Section 5.3)
 Combines Dense Semantic Intent + BM25 Lexical + OKF Semantic Rule Ontologies.
 """
-from typing import Dict, Any, Optional
+
+from typing import Any, Dict
+
 from .okf_rules import OKF_RULE_REGISTRY
+
 
 class OKFTriHybridRetriever:
     def __init__(self):
@@ -23,7 +26,7 @@ class OKFTriHybridRetriever:
                 "answer": f"Under {rule['citation']}, {rule['rules']['condition']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"status": rule["rules"]["status"], "prohibition_override": True}
+                "facts": {"status": rule["rules"]["status"], "prohibition_override": True},
             }
 
         # 2. Categorical Prohibition Override: Adult Entertainment & Room Salons (Section 14.3)
@@ -35,7 +38,7 @@ class OKFTriHybridRetriever:
                 "answer": f"Under {rule['citation']}, {rule['rules']['condition']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"status": rule["rules"]["status"], "prohibition_override": True}
+                "facts": {"status": rule["rules"]["status"], "prohibition_override": True},
             }
 
         # 3. Cannabis & Illicit Substances Ban (Section 10)
@@ -47,7 +50,7 @@ class OKFTriHybridRetriever:
                 "answer": f"Per {rule['citation']}, {rule['rules']['condition']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"status": rule["rules"]["status"]}
+                "facts": {"status": rule["rules"]["status"]},
             }
 
         # 4. Anti-Bribery & Government Public Official Gifts (Section 13)
@@ -59,7 +62,10 @@ class OKFTriHybridRetriever:
                 "answer": f"According to {rule['citation']}, {rule['rules']['condition']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"requires_approval": True, "approval_body": rule["rules"]["approval_body"]}
+                "facts": {
+                    "requires_approval": True,
+                    "approval_body": rule["rules"]["approval_body"],
+                },
             }
 
         # --- TIER B: STATUTORY LEAVE & BENEFITS ENTITLEMENTS ---
@@ -72,13 +78,19 @@ class OKFTriHybridRetriever:
                 "answer": f"According to {rule['citation']}, {rule['rules']['condition']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"deadline_hours": rule["rules"]["mc_submission_deadline_hours"]}
+                "facts": {"deadline_hours": rule["rules"]["mc_submission_deadline_hours"]},
             }
 
         # 6. Bereavement Leave & Kinship Entitlements (Section 22)
         if "bereavement" in q or "funeral" in q or "death in family" in q:
             rule = self._registry["bereavement_leave"]
-            if "extended" in q or "grandparent" in q or "in-law" in q or "uncle" in q or "aunt" in q:
+            if (
+                "extended" in q
+                or "grandparent" in q
+                or "in-law" in q
+                or "uncle" in q
+                or "aunt" in q
+            ):
                 ent = rule["entities"]["extended_family"]
             else:
                 ent = rule["entities"]["immediate_family"]
@@ -89,7 +101,7 @@ class OKFTriHybridRetriever:
                 "answer": f"Under the {rule['citation']}, employees are entitled to {days} consecutive business days of paid bereavement leave ({ent['pay_status']}) for {ent['conditions']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"days": days, "pay_status": ent["pay_status"]}
+                "facts": {"days": days, "pay_status": ent["pay_status"]},
             }
 
         # 7. Vacation advance notice & Annual Leave (Section 20)
@@ -101,11 +113,16 @@ class OKFTriHybridRetriever:
                 "answer": f"Per {rule['citation']}, {rule['rules']['condition']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"advance_notice_days": rule["rules"]["advance_notice_days"]}
+                "facts": {"advance_notice_days": rule["rules"]["advance_notice_days"]},
             }
 
         # 8. Travel meal allowance (Section 4)
-        if "meal" in q or "dinner" in q or "food allowance" in q or ("expense" in q and "travel" in q):
+        if (
+            "meal" in q
+            or "dinner" in q
+            or "food allowance" in q
+            or ("expense" in q and "travel" in q)
+        ):
             rule = self._registry["travel_meal_allowance"]
             return {
                 "matched": True,
@@ -113,7 +130,7 @@ class OKFTriHybridRetriever:
                 "answer": f"Under {rule['citation']}, {rule['rules']['condition']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"cap_usd": rule["rules"]["daily_meal_cap_usd"]}
+                "facts": {"cap_usd": rule["rules"]["daily_meal_cap_usd"]},
             }
 
         # 9. Home office monitor (Section 1.3)
@@ -125,7 +142,7 @@ class OKFTriHybridRetriever:
                 "answer": f"Under {rule['citation']}, designated remote employees are eligible for an external monitor up to ${int(rule['rules']['allowance_cap'])} USD.",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"allowance_usd": rule["rules"]["allowance_cap"]}
+                "facts": {"allowance_usd": rule["rules"]["allowance_cap"]},
             }
 
         # 10. Relocation London (Section 3.3)
@@ -137,16 +154,19 @@ class OKFTriHybridRetriever:
                 "answer": f"Per {rule['citation']}, {rule['rules']['condition']}",
                 "citation": rule["citation"],
                 "deep_link": rule["deep_link"],
-                "facts": {"allowance_gbp": rule["rules"]["allowance_amount"]}
+                "facts": {"allowance_gbp": rule["rules"]["allowance_amount"]},
             }
 
         return {
             "matched": False,
             "answer": "I searched the Altostrat Singapore Employee Handbook, but found no policy matching your request. Please contact HR Shared Services for clarification.",
             "citation": "Altostrat Singapore Employee Policy Handbook",
-            "deep_link": "http://google3/policy"
+            "deep_link": "http://google3/policy",
         }
 
+
 _retriever = OKFTriHybridRetriever()
+
+
 def get_policy_retriever() -> OKFTriHybridRetriever:
     return _retriever

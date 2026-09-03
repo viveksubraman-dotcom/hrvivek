@@ -1,0 +1,224 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "tc_multi_01_medical_leave_delegation",
+      "agent_data": {
+        "agents": {
+          "router": {
+            "agent_id": "router",
+            "agent_type": "RouterAgent",
+            "instruction": "Route medical and transactional requests to specialized sub-agents."
+          },
+          "hr_specialist": {
+            "agent_id": "hr_specialist",
+            "agent_type": "SpecialistAgent",
+            "instruction": "Execute WorkWeek leave operations via MCP.",
+            "tools": [{
+              "function_declarations": [{
+                "name": "workweek_submit_leave_request",
+                "description": "Submit leave request into WorkWeek over MCP."
+              }]
+            }]
+          },
+          "it_specialist": {
+            "agent_id": "it_specialist",
+            "agent_type": "SpecialistAgent",
+            "instruction": "Execute ServiceImmediately access delegation tickets over MCP.",
+            "tools": [{
+              "function_declarations": [{
+                "name": "service_immediately_create_incident",
+                "description": "Create access delegation ticket in ServiceImmediately over MCP."
+              }]
+            }]
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"parts": [{"text": "I need to take medical leave starting next Monday. Set up my leave and route access."}]}
+              },
+              {
+                "author": "router",
+                "content": {"parts": [{"text": "Routing request to HR Specialist and IT Operations Specialist for Saga coordination."}]}
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "hr_specialist",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "name": "workweek_submit_leave_request",
+                        "args": {
+                          "employee_id": "EMP-90210",
+                          "leave_type": "Sick Leave",
+                          "start_date": "2026-09-07",
+                          "end_date": "2026-09-18"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "tool",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "name": "workweek_submit_leave_request",
+                        "response": {
+                          "status": "APPROVED",
+                          "request_id": "LR-88421",
+                          "work_days": 10,
+                          "remaining_balance_days": 2.0
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "it_specialist",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "name": "service_immediately_create_incident",
+                        "args": {
+                          "requestor_id": "EMP-90210",
+                          "category": "IT-Access",
+                          "short_description": "Delegate production approval authority to Sarah Jenkins during medical leave",
+                          "priority": "3 - Moderate"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "tool",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "name": "service_immediately_create_incident",
+                        "response": {
+                          "status": "New",
+                          "ticket_id": "INC-55423"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "router",
+                "content": {
+                  "parts": [
+                    {"text": "Medical leave request LR-88421 for 10 working days starting 2026-09-07 has been confirmed in WorkWeek. System approval access has been delegated to Sarah Jenkins via ticket INC-55423."}
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "tc_multi_02_relocation_allowance_saga",
+      "agent_data": {
+        "agents": {
+          "router": {"agent_id": "router", "agent_type": "RouterAgent", "instruction": "Route relocation queries"},
+          "mobility_agent": {"agent_id": "mobility_agent", "agent_type": "SpecialistAgent", "instruction": "Compute relocation stipends and logistics"}
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"parts": [{"text": "I am transferring to the London office next month. What is the allowance and badge?"}]}
+              },
+              {
+                "author": "mobility_agent",
+                "content": {"parts": [{"text": "Under Global Mobility Policy Section 7, approved permanent relocations from North America to the United Kingdom qualify for a £5,000 relocation stipend. Facility badge transfer and UK office credentials have been initiated."}]}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "tc_multi_03_equipment_procurement_saga",
+      "agent_data": {
+        "agents": {
+          "router": {"agent_id": "router", "agent_type": "RouterAgent"},
+          "it_specialist": {"agent_id": "it_specialist", "agent_type": "SpecialistAgent"}
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"parts": [{"text": "I am eligible for a home office monitor under remote work policy. Can you order one for me?"}]}
+              },
+              {
+                "author": "it_specialist",
+                "content": {
+                  "parts": [
+                    {"text": "Verified WorkWeek remote designation (Remote - US, Austin TX). Procurement ticket INC-55424 created for standard 27-inch 4K monitor. Hardware dispatch scheduled to 123 Tech Lane, Austin TX 78701."}
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "tc_multi_04_slot_filling_and_cancellation",
+      "agent_data": {
+        "agents": {
+          "router": {"agent_id": "router", "agent_type": "RouterAgent"}
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {"parts": [{"text": "Submit 2 days off"}]}
+              },
+              {
+                "author": "router",
+                "content": {"parts": [{"text": "You requested 2-day leave. Please confirm your desired start and end dates."}]}
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "user",
+                "content": {"parts": [{"text": "Never mind, please cancel this request"}]}
+              },
+              {
+                "author": "router",
+                "content": {"parts": [{"text": "Understood. Your pending leave request has been canceled."}]}
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 """
 DLP & Sensitive Personally Identifiable Information (SPII) Masking Pipeline.
 """
+
 import re
 
 NRIC_REGEX = r"\b[STFGQM]\d{7}[A-Z]\b"
@@ -13,6 +14,7 @@ PHI_MEDICAL_PATTERNS = [
     r"(?i)\b(prescription|dosage|medication|antidepressant|insulin|codeine)\b",
 ]
 
+
 def mask_spii(text: str) -> str:
     if not text:
         return text
@@ -20,6 +22,7 @@ def mask_spii(text: str) -> str:
     masked = re.sub(CREDIT_CARD_REGEX, "[REDACTED_CREDIT_CARD]", masked)
     masked = re.sub(PHONE_REGEX, "[REDACTED_PHONE]", masked)
     return masked
+
 
 def mask_phi(text: str) -> str:
     """Masks Protected Health Information (PHI) and medical conditions (HIPAA / GDPR Art 9)."""
@@ -29,6 +32,7 @@ def mask_phi(text: str) -> str:
     for pat in PHI_MEDICAL_PATTERNS:
         masked = re.sub(pat, "[REDACTED_MEDICAL_PHI]", masked)
     return masked
+
 
 def sanitize_inbound_prompt(prompt: str) -> str:
     """Pre-persistence inbound sanitization hook for session state (ARB P0-01 Remediation)."""

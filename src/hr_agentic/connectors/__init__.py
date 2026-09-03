@@ -1,2 +1,2 @@
-from .workweek import WorkWeekConnector, get_workweek_client
 from .service_immediately import ServiceImmediatelyConnector, get_service_immediately_client
+from .workweek import WorkWeekConnector, get_workweek_client

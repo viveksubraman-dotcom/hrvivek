@@ -2,8 +2,11 @@
 Unit Test Loop: ServiceImmediately ITSM Connector
 Hermetic unit tests verifying incident creation, comments, lifecycle transitions, deduplication, and priority anti-inflation.
 """
+
 import pytest
+
 from hr_agentic.connectors.service_immediately import get_service_immediately_client
+
 
 class TestIncidentManagement:
     def test_create_incident_success(self):
@@ -12,7 +15,7 @@ class TestIncidentManagement:
             requestor_id="EMP-90210",
             category="IT Support",
             short_desc="External display power flickers intermittently",
-            priority="3 - Moderate"
+            priority="3 - Moderate",
         )
         assert inc["ticket_id"].startswith("INC-")
         assert inc["status"] == "New"
@@ -48,8 +51,11 @@ class TestIncidentManagement:
         si = get_service_immediately_client()
         with pytest.raises(ValueError, match="Illegal lifecycle transition"):
             # New incident cannot jump to Closed
-            new_inc = si.create_incident("EMP-90210", "IT-Audio", "Testing invalid jump", "3 - Moderate")
+            new_inc = si.create_incident(
+                "EMP-90210", "IT-Audio", "Testing invalid jump", "3 - Moderate"
+            )
             si.update_status(new_inc["ticket_id"], "Closed")
+
 
 class TestServiceImmediatelyGuardrails:
     def test_anti_duplicate_suppression_5min(self):
@@ -66,5 +72,7 @@ class TestServiceImmediatelyGuardrails:
 
     def test_priority_anti_inflation_auto_downgrade(self):
         si = get_service_immediately_client()
-        inc = si.create_incident("EMP-90210", "Facilities", "The coffee machine needs fresh beans", "1 - Critical")
+        inc = si.create_incident(
+            "EMP-90210", "Facilities", "The coffee machine needs fresh beans", "1 - Critical"
+        )
         assert inc["priority"] == "4 - Low"

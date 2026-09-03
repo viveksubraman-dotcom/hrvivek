@@ -1,9 +1,12 @@
 """
 WorkWeek (HCM) Connector & Mock Store (FR-3.1 ~ FR-3.4)
 """
-from typing import Dict, Any, Optional
+
 from datetime import datetime, timezone
+from typing import Any, Dict, Optional
+
 from ..validation.engine import validate_leave_request, validate_phone_e164
+
 
 class WorkWeekConnector:
     def __init__(self):
@@ -21,15 +24,15 @@ class WorkWeekConnector:
                 "home_address": "123 Tech Lane, Austin TX 78701",
                 "phone_number": "+1 512 555 0199",
                 "balances": {
-                    "vacation_accrued": 80.0, # hours (10 days)
+                    "vacation_accrued": 80.0,  # hours (10 days)
                     "vacation_used": 40.0,
-                    "vacation_remaining": 40.0, # hours (5 days)
+                    "vacation_remaining": 40.0,  # hours (5 days)
                     "sick_accrued": 112.0,
                     "sick_used": 16.0,
-                    "sick_remaining": 96.0, # hours (12 days)
+                    "sick_remaining": 96.0,  # hours (12 days)
                 },
                 "leave_requests": [],
-                "staged_updates": {}
+                "staged_updates": {},
             }
         }
 
@@ -56,7 +59,7 @@ class WorkWeekConnector:
                     "sick_remaining": 96.0,
                 },
                 "leave_requests": [],
-                "staged_updates": {}
+                "staged_updates": {},
             }
         }
 
@@ -79,15 +82,22 @@ class WorkWeekConnector:
             "phone_number": emp.get("phone_number", ""),
         }
 
-    def update_contact(self, employee_id: str, home_address: Optional[str] = None, phone_number: Optional[str] = None) -> Dict[str, Any]:
+    def update_contact(
+        self,
+        employee_id: str,
+        home_address: Optional[str] = None,
+        phone_number: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """PUT /api/v1/employees/{id}/contact"""
         emp = self._employees.get(employee_id)
         if not emp:
             raise ValueError(f"Employee {employee_id} not found")
-            
+
         if phone_number:
             if not validate_phone_e164(phone_number):
-                raise ValueError(f"Validation Error: Phone number '{phone_number}' does not comply with E.164 international format.")
+                raise ValueError(
+                    f"Validation Error: Phone number '{phone_number}' does not comply with E.164 international format."
+                )
             emp["phone_number"] = phone_number
 
         if home_address:
@@ -98,7 +108,7 @@ class WorkWeekConnector:
             "updated_timestamp": datetime.now(timezone.utc).isoformat(),
             "employee_id": employee_id,
             "home_address": emp["home_address"],
-            "phone_number": emp["phone_number"]
+            "phone_number": emp["phone_number"],
         }
 
     def get_leave_balances(self, employee_id: str) -> Dict[str, Any]:
@@ -117,7 +127,14 @@ class WorkWeekConnector:
             "sick_remaining_days": b["sick_remaining"] / 8.0,
         }
 
-    def submit_leave_request(self, employee_id: str, leave_type: str, start_date: str, end_date: str, requested_days: Optional[float] = None) -> Dict[str, Any]:
+    def submit_leave_request(
+        self,
+        employee_id: str,
+        leave_type: str,
+        start_date: str,
+        end_date: str,
+        requested_days: Optional[float] = None,
+    ) -> Dict[str, Any]:
         """POST /api/v1/leave/requests"""
         emp = self._employees.get(employee_id)
         if not emp:
@@ -144,7 +161,7 @@ class WorkWeekConnector:
             "work_days": req_days,
             "hours": hours_deducted,
             "status": "SUBMITTED",
-            "submitted_at": datetime.now(timezone.utc).isoformat()
+            "submitted_at": datetime.now(timezone.utc).isoformat(),
         }
         emp["leave_requests"].append(record)
 
@@ -154,10 +171,12 @@ class WorkWeekConnector:
             "leave_type": leave_type,
             "work_days": req_days,
             "remaining_balance_days": emp["balances"][b_key] / 8.0,
-            "remaining_balance_hours": emp["balances"][b_key]
+            "remaining_balance_hours": emp["balances"][b_key],
         }
 
-    def stage_contact_update(self, employee_id: str, address: str, status: str = "STAGED") -> Dict[str, Any]:
+    def stage_contact_update(
+        self, employee_id: str, address: str, status: str = "STAGED"
+    ) -> Dict[str, Any]:
         """Two-phase commit: Stages address update without immediate tax commit."""
         emp = self._employees.get(employee_id)
         if not emp:
@@ -167,7 +186,7 @@ class WorkWeekConnector:
             "new_address": address,
             "previous_address": emp["home_address"],
             "status": status,
-            "staged_at": datetime.now(timezone.utc).isoformat()
+            "staged_at": datetime.now(timezone.utc).isoformat(),
         }
         return {"staged_id": staged_id, "status": status, "address": address}
 
@@ -178,6 +197,9 @@ class WorkWeekConnector:
             del emp["staged_updates"][staged_id]
         return {"status": "ABORTED_ROLLBACK_COMPLETE", "staged_id": staged_id}
 
+
 _ww_client = WorkWeekConnector()
+
+
 def get_workweek_client() -> WorkWeekConnector:
     return _ww_client

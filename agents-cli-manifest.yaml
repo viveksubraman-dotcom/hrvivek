@@ -12,7 +12,7 @@ create_params:
 eval_params:
   eval_config: tests/eval/eval_config.yaml
   dataset_directory: tests/eval/datasets
-  default_evalset: tests/eval/datasets/golden_mas_eval.evalset.json
+  default_evalset: tests/eval/datasets/eval-single-turn.json
   eval_framework: google_adk
 test_params:
   test_runner: pytest

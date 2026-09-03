@@ -2,9 +2,10 @@
 Unit Test Loop: OKF Semantic Rules Registry & Policy Retriever
 Hermetic unit tests verifying rule evaluation, statutory limits, and categorical bans.
 """
-import pytest
+
 from hr_agentic.knowledge.okf_rules import OKF_RULE_REGISTRY
 from hr_agentic.knowledge.retriever import get_policy_retriever
+
 
 class TestOKFRulesRegistry:
     def test_registry_contains_core_rules(self):
@@ -32,10 +33,13 @@ class TestOKFRulesRegistry:
         assert rule["section"] == "Section 13"
         assert "RCI" in rule["rules"]["approval_body"]
 
+
 class TestOKFPolicyRetriever:
     def test_retriever_bereavement_query(self):
         retriever = get_policy_retriever()
-        res = retriever.query_policy("What is the company bereavement leave policy for immediate family?")
+        res = retriever.query_policy(
+            "What is the company bereavement leave policy for immediate family?"
+        )
         assert res["matched"] is True
         assert "5 consecutive business days" in res["answer"]
         assert "Section 22" in res["citation"]
