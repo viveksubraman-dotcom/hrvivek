@@ -46,10 +46,27 @@ def validate_leave_request(start_str: str, end_str: str, available_days: float) 
         return False, f"Invalid date range: start_date ({start_str}) is after end_date ({end_str}).", 0
 
     working_days = calculate_working_days(start_str, end_str)
+    if working_days == 0:
+        return False, "Invalid leave request: Selected dates contain 0 working business days (e.g., weekends only).", 0
+
     if working_days > available_days:
         return False, f"Insufficient leave balance: requested {working_days} working days, but accrued balance is only {available_days} days.", working_days
 
     return True, None, working_days
+
+def validate_leave_increment(requested_days: float) -> Tuple[bool, Optional[str]]:
+    """Enforces minimum 0.5 day (half-day) increment boundary condition."""
+    if requested_days <= 0:
+        return False, f"Invalid duration: Requested leave days must be greater than 0 (got {requested_days})."
+    if (requested_days * 2) % 1 != 0:
+        return False, f"Invalid increment: Leave must be requested in full or half-day increments (0.5 days), got {requested_days}."
+    return True, None
+
+def validate_employee_id(employee_id: str) -> bool:
+    """Validates Employee ID format (^EMP-\\d{5}$)."""
+    if not employee_id or not isinstance(employee_id, str):
+        return False
+    return bool(re.match(r"^EMP-\d{5}$", employee_id.strip()))
 
 def validate_phone_e164(phone: str) -> bool:
     """Validates E.164 international phone number format."""

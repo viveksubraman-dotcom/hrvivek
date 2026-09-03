@@ -36,5 +36,21 @@ def health():
 @app.post("/api/v1/chat")
 def chat(req: ChatRequest):
     orchestrator = get_orchestrator()
-    res = orchestrator.process_message(req.prompt)
+    claims = UserClaims(user_id=req.user_id or "EMP-90210", user_email=f"{req.user_id or 'EMP-90210'}@altostrat.com")
+    res = orchestrator.process_message(req.prompt, user=claims)
     return res
+
+class FeedbackRequest(BaseModel):
+    score: int
+    deflected: bool
+    comments: Optional[str] = None
+
+@app.post("/api/v1/conversations/{conversation_id}/feedback")
+def submit_feedback(conversation_id: str, feedback: FeedbackRequest):
+    return {
+        "status": "SUCCESS",
+        "conversation_id": conversation_id,
+        "recorded_score": feedback.score,
+        "deflected": feedback.deflected,
+        "comments": feedback.comments
+    }

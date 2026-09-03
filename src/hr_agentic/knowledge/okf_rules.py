@@ -14,10 +14,10 @@ OKF_RULE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "title": "Bereavement Leave Entitlements",
         "entities": {
             "immediate_family": {
-                "members": ["spouse", "child", "parent", "sibling", "father", "mother", "brother", "sister"],
+                "members": ["spouse", "domestic partner", "civil partner", "partner", "child", "parent", "sibling", "father", "mother", "brother", "sister", "legal guardian", "foster child"],
                 "days_entitlement": 5,
                 "pay_status": "Full Pay",
-                "conditions": "5 consecutive business days upon death of immediate family member."
+                "conditions": "5 consecutive business days upon death of immediate family member (including spouse, domestic partner, child, parent, sibling, legal guardian)."
             },
             "extended_family": {
                 "members": ["grandparent", "in-law", "uncle", "aunt"],
@@ -122,6 +122,32 @@ OKF_RULE_REGISTRY: Dict[str, Dict[str, Any]] = {
             "currency": "GBP",
             "badge_category": "Facilities-Badge",
             "condition": "Relocation allowance is £5,000 GBP. Requires staging address in WorkWeek and submitting London Canary Wharf Facilities badge request."
+        }
+    },
+    "gift_card_ban": {
+        "rule_id": "OKF-RULE-PROHIBITION-09",
+        "policy_id": "POL-SG-2026-V1",
+        "section": "Section 4.5",
+        "citation": "Altostrat Singapore Employee Policy Handbook, Section 4.5",
+        "deep_link": "http://google3/policy#sec-4.5",
+        "title": "Categorical Prohibition: Gift Cards & Cash Equivalents",
+        "rules": {
+            "status": "Strictly Prohibited",
+            "scope": "All employee travel expenses and homestay host gifts",
+            "condition": "While homestay host gifts under US$50 are allowable under Section 4.2, gift cards, prepaid vouchers, and cash equivalents are strictly prohibited from company expense reimbursement regardless of dollar amount."
+        }
+    },
+    "adult_entertainment_ban": {
+        "rule_id": "OKF-RULE-PROHIBITION-10",
+        "policy_id": "POL-SG-2026-V1",
+        "section": "Section 14.3",
+        "citation": "Altostrat Singapore Employee Policy Handbook, Section 14.3",
+        "deep_link": "http://google3/policy#sec-14.3",
+        "title": "Categorical Prohibition: Adult Entertainment & Room Salons",
+        "rules": {
+            "status": "Strictly Prohibited",
+            "scope": "All client entertainment and meals",
+            "condition": "Venues featuring adult entertainment, hostesses, or room salons are strictly prohibited from company expense reimbursement, even if the total cost is under the standard US$100 threshold."
         }
     }
 }

@@ -1,0 +1,20 @@
+name: hr-agentic-solution
+acli_version: 1.5.0
+agent_directory: src/hr_agentic
+region: us-central1
+language: python
+create_params:
+  deployment_target: none
+  session_type: in_memory
+  cicd_runner: skip
+  is_a2a: false
+  agent_guidance_filename: GEMINI.md
+eval_params:
+  eval_config: tests/eval/eval_config.yaml
+  dataset_directory: tests/eval/datasets
+  default_evalset: tests/eval/datasets/golden_mas_eval.evalset.json
+  eval_framework: google_adk
+test_params:
+  test_runner: pytest
+  test_directory: tests
+  security_framework: STRIDE_SAIF

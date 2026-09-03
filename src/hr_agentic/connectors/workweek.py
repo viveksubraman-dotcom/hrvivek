@@ -2,7 +2,7 @@
 WorkWeek (HCM) Connector & Mock Store (FR-3.1 ~ FR-3.4)
 """
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from ..validation.engine import validate_leave_request, validate_phone_e164
 
 class WorkWeekConnector:
@@ -27,6 +27,33 @@ class WorkWeekConnector:
                     "sick_accrued": 112.0,
                     "sick_used": 16.0,
                     "sick_remaining": 96.0, # hours (12 days)
+                },
+                "leave_requests": [],
+                "staged_updates": {}
+            }
+        }
+
+    def reset(self):
+        self._employees = {
+            "EMP-90210": {
+                "employee_id": "EMP-90210",
+                "name": "Jane Doe",
+                "email": "jane.doe@enterprise.corp",
+                "department": "Engineering",
+                "role": "Senior Software Engineer",
+                "manager": "Sarah Jenkins",
+                "manager_id": "MGR-5002",
+                "hire_date": "2023-03-15",
+                "work_location": "Remote - US",
+                "home_address": "123 Tech Lane, Austin TX 78701",
+                "phone_number": "+1 512 555 0199",
+                "balances": {
+                    "vacation_accrued": 80.0,
+                    "vacation_used": 40.0,
+                    "vacation_remaining": 40.0,
+                    "sick_accrued": 112.0,
+                    "sick_used": 16.0,
+                    "sick_remaining": 96.0,
                 },
                 "leave_requests": [],
                 "staged_updates": {}
@@ -68,7 +95,7 @@ class WorkWeekConnector:
 
         return {
             "status": "SUCCESS",
-            "updated_timestamp": datetime.utcnow().isoformat(),
+            "updated_timestamp": datetime.now(timezone.utc).isoformat(),
             "employee_id": employee_id,
             "home_address": emp["home_address"],
             "phone_number": emp["phone_number"]
@@ -117,7 +144,7 @@ class WorkWeekConnector:
             "work_days": req_days,
             "hours": hours_deducted,
             "status": "SUBMITTED",
-            "submitted_at": datetime.utcnow().isoformat()
+            "submitted_at": datetime.now(timezone.utc).isoformat()
         }
         emp["leave_requests"].append(record)
 
@@ -135,12 +162,12 @@ class WorkWeekConnector:
         emp = self._employees.get(employee_id)
         if not emp:
             raise ValueError(f"Employee {employee_id} not found")
-        staged_id = f"STAGE-{datetime.utcnow().strftime('%M%S')}"
+        staged_id = f"STAGE-{datetime.now(timezone.utc).strftime('%M%S')}"
         emp["staged_updates"][staged_id] = {
             "new_address": address,
             "previous_address": emp["home_address"],
             "status": status,
-            "staged_at": datetime.utcnow().isoformat()
+            "staged_at": datetime.now(timezone.utc).isoformat()
         }
         return {"staged_id": staged_id, "status": status, "address": address}
 

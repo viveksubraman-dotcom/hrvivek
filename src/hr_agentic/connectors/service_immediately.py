@@ -2,12 +2,30 @@
 ServiceImmediately (ITSM/HRSD) Connector & Mock Store (FR-4.1 ~ FR-4.3)
 """
 from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from ..validation.engine import validate_ticket_transition, validate_ticket_priority
 
 class ServiceImmediatelyConnector:
     def __init__(self):
         self._incidents: Dict[str, Dict[str, Any]] = {
+            "INC0094821": {
+                "ticket_id": "INC0094821",
+                "requestor_id": "EMP-90210",
+                "category": "IT-Network",
+                "short_description": "VPN connection drops every 10 minutes",
+                "priority": "3 - Moderate",
+                "status": "In-Progress",
+                "assignee": "Alex Chen (Network Ops)",
+                "created_at": "2026-09-01T09:00:00Z",
+                "comments": [
+                    {"author": "System", "text": "Ticket routed to Network Tier 2", "time": "2026-09-01T09:05:00Z"},
+                    {"author": "Alex Chen", "text": "Investigating Singapore Gateway logs", "time": "2026-09-01T10:15:00Z"}
+                ]
+            }
+        }
+
+    def reset(self):
+        self._incidents = {
             "INC0094821": {
                 "ticket_id": "INC0094821",
                 "requestor_id": "EMP-90210",
@@ -33,10 +51,10 @@ class ServiceImmediatelyConnector:
 
     def check_duplicate(self, requestor_id: str, category: str, window_minutes: int = 5) -> Optional[Dict[str, Any]]:
         """FR-4.3 / TC-INTG-04: Anti-duplicate ticket detection within 5-minute sliding window."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         for t in self._incidents.values():
             if t["requestor_id"] == requestor_id and t["category"] == category and t["status"] in ["New", "In-Progress", "Assigned"]:
-                created_dt = datetime.fromisoformat(t["created_at"].replace("Z", "+00:00")).replace(tzinfo=None)
+                created_dt = datetime.fromisoformat(t["created_at"].replace("Z", "+00:00"))
                 if (now - created_dt) <= timedelta(minutes=window_minutes):
                     return t
         return None
@@ -66,7 +84,7 @@ class ServiceImmediatelyConnector:
             "status": "New",
             "assignee": "Unassigned (Auto-Triage)",
             "shipping_address": shipping_address,
-            "created_at": datetime.utcnow().isoformat() + "Z",
+            "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "automation_source": "AI_HR_AGENT_MVP1",
             "comments": []
         }
@@ -79,7 +97,7 @@ class ServiceImmediatelyConnector:
         comment_entry = {
             "author": author_id,
             "text": comment_text,
-            "time": datetime.utcnow().isoformat() + "Z",
+            "time": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "source": "AI_HR_AGENT_MVP1"
         }
         ticket["comments"].append(comment_entry)

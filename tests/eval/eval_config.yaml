@@ -1,0 +1,19 @@
+# Google Agent Development Kit (ADK) Evaluation Config
+criteria:
+  tool_trajectory_avg_score: 0.80
+  response_match_score: 0.80
+  groundedness: 1.00
+  delegation: 1.80
+  abstention: 2.00
+  citation: 1.90
+rubrics:
+  mas_gotcha_navigation: 2.00
+  priority_anti_inflation: 2.00
+  saga_compensation: 2.00
+dataset:
+  path: tests/eval/datasets/golden_mas_eval.evalset.json
+  stratification:
+    tier_1_happy_path: 0.40
+    tier_2_mas_gotchas: 0.30
+    tier_3_hallucination_baits: 0.15
+    tier_4_out_of_scope_boundary: 0.15
