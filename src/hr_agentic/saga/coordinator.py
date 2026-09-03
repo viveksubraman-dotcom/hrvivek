@@ -1,27 +1,33 @@
 """
-Durable Distributed Saga Coordinator (Cloud Firestore WAL Simulation)
-Implements 2-Phase staging, idempotent execution, and compensating rollbacks (SDD Section 5.5).
+Durable Distributed Saga Coordinator (Cloud Firestore Native State Synchronization)
+Implements physical schema mapping, 2-Phase staging, idempotent execution,
+and compensating rollbacks (SDD Section 5.5).
 """
 
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+
+from .firestore_store import FirestoreSagaStore, SagaDocumentSchema
 
 
 class SagaCoordinator:
-    def __init__(self):
-        self._sagas: Dict[str, Dict[str, Any]] = {}
+    def __init__(self, store: Optional[FirestoreSagaStore] = None):
+        self.store = store or FirestoreSagaStore()
 
     def start_saga(self, saga_type: str, user_id: str) -> str:
         saga_id = f"SAGA-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{uuid.uuid4().hex[:6]}"
-        self._sagas[saga_id] = {
-            "saga_id": saga_id,
-            "saga_type": saga_type,
-            "user_id": user_id,
-            "status": "INITIATED",
-            "steps": [],
-            "created_at": datetime.now(timezone.utc).isoformat(),
-        }
+        now_iso = datetime.now(timezone.utc).isoformat()
+        saga_doc = SagaDocumentSchema(
+            saga_id=saga_id,
+            saga_type=saga_type,
+            user_id=user_id,
+            status="INITIATED",
+            steps=[],
+            created_at=now_iso,
+            updated_at=now_iso,
+        )
+        self.store.persist_saga(saga_doc)
         return saga_id
 
     def log_step(
@@ -32,29 +38,29 @@ class SagaCoordinator:
         payload: Dict[str, Any],
         status: str = "COMPLETED",
     ):
-        if saga_id in self._sagas:
-            self._sagas[saga_id]["steps"].append(
-                {
-                    "step_name": step_name,
-                    "system": system,
-                    "payload": payload,
-                    "status": status,
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                }
-            )
-            self._sagas[saga_id]["status"] = f"STEP_{step_name}_{status}"
+        self.store.log_step(
+            saga_id=saga_id,
+            step_name=step_name,
+            system=system,
+            payload=payload,
+            status=status,
+        )
 
     def commit_saga(self, saga_id: str):
-        if saga_id in self._sagas:
-            self._sagas[saga_id]["status"] = "COMMITTED"
+        self.store.finalize_saga(saga_id, status="COMMITTED")
 
     def abort_saga(self, saga_id: str, reason: str):
-        if saga_id in self._sagas:
-            self._sagas[saga_id]["status"] = "ABORTED"
-            self._sagas[saga_id]["abort_reason"] = reason
+        self.store.finalize_saga(saga_id, status="ABORTED", abort_reason=reason)
+
+    def get_saga(self, saga_id: str) -> Optional[Dict[str, Any]]:
+        return self.store.get_saga(saga_id)
 
     def reset(self):
-        self._sagas.clear()
+        self.store.clear()
+
+    @property
+    def _sagas(self) -> Dict[str, Any]:
+        return self.store._memory_cache
 
 
 _coordinator = SagaCoordinator()

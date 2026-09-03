@@ -3,31 +3,64 @@ Live Cloud Run 43-Scenario Production Benchmark Test Suite
 Directly executes all 43 Production Matrix scenarios against the live Cloud Run service in Argolis.
 """
 
+import os
+import shutil
 import subprocess
 
 import httpx
 import pytest
 
-CLOUD_RUN_URL = "https://hr-agentic-service-297934069315.us-central1.run.app"
+CLOUD_RUN_URL = os.getenv(
+    "CLOUD_RUN_URL",
+    "https://hr-agentic-service-297934069315.us-central1.run.app",
+)
 
 
-def get_live_token() -> str:
-    res = subprocess.run(
-        [
-            "/usr/local/google/home/viveksubraman/google-cloud-sdk/bin/gcloud",
-            "auth",
-            "print-identity-token",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return res.stdout.strip()
+def get_gcloud_binary() -> str | None:
+    """Resolve gcloud binary dynamically without hardcoding machine-specific paths."""
+    custom_bin = os.getenv("GCLOUD_BIN")
+    if custom_bin and os.path.isfile(custom_bin) and os.access(custom_bin, os.X_OK):
+        return custom_bin
+    system_gcloud = shutil.which("gcloud")
+    if system_gcloud:
+        return system_gcloud
+    candidate_paths = [
+        os.path.expanduser("~/google-cloud-sdk/bin/gcloud"),
+        "/usr/lib/google-cloud-sdk/bin/gcloud",
+        "/snap/bin/gcloud",
+        "/google/bin/releases/cloud-platform-tools/gcloud",
+    ]
+    for path in candidate_paths:
+        if os.path.isfile(path) and os.access(path, os.X_OK):
+            return path
+    return None
+
+
+def get_live_token() -> str | None:
+    """Fetch identity token safely; returns None if credentials or binary are unavailable."""
+    gcloud_bin = get_gcloud_binary()
+    if not gcloud_bin:
+        return None
+    try:
+        res = subprocess.run(
+            [gcloud_bin, "auth", "print-identity-token"],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10,
+        )
+        return res.stdout.strip()
+    except Exception:
+        return None
 
 
 @pytest.fixture(scope="session")
 def live_client():
     token = get_live_token()
+    if not token:
+        pytest.skip(
+            "Live Cloud Run credentials / gcloud binary unavailable in execution environment."
+        )
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     with httpx.Client(base_url=CLOUD_RUN_URL, headers=headers, timeout=30.0) as client:
         try:

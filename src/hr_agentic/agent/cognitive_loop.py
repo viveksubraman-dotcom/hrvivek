@@ -6,6 +6,13 @@ Coordinates Security Pre-Scan, Specialist Sub-Agents, Sagas, and Output DLP.
 import re
 from typing import Any, Dict, Optional
 
+from ..config import (
+    APP_ENV,
+    GEMINI_MODEL,
+    GOOGLE_CLOUD_LOCATION,
+    GOOGLE_CLOUD_PROJECT,
+    GOOGLE_GENAI_USE_VERTEXAI,
+)
 from ..connectors.service_immediately import get_service_immediately_client
 from ..connectors.workweek import get_workweek_client
 from ..knowledge.retriever import get_policy_retriever
@@ -26,6 +33,22 @@ class HRAgenticOrchestrator:
         self.si = get_service_immediately_client()
         self.retriever = get_policy_retriever()
         self._sessions: Dict[str, Dict[str, Any]] = {}
+        self.gemini_client = self._init_gemini_client()
+
+    def _init_gemini_client(self):
+        """Initialize Vertex AI Gemini client (skipped in hermetic test environments)."""
+        if APP_ENV in ("test", "testing"):
+            return None
+        try:
+            from google import genai
+
+            return genai.Client(
+                vertexai=GOOGLE_GENAI_USE_VERTEXAI,
+                project=GOOGLE_CLOUD_PROJECT,
+                location=GOOGLE_CLOUD_LOCATION,
+            )
+        except Exception:
+            return None
 
     def reset(self):
         self._sessions.clear()
@@ -356,10 +379,30 @@ class HRAgenticOrchestrator:
             session["last_topic"] = "bereavement"
 
         policy_res = self.retriever.query_policy(prompt)
+        answer_text = policy_res["answer"]
+
+        # If live Gemini 3.5 client is active (production), synthesize grounded response
+        if self.gemini_client and APP_ENV not in ("test", "testing"):
+            try:
+                system_prompt = (
+                    "You are an enterprise HR Policy Assistant. Answer the employee's query "
+                    "truthfully and concisely based strictly on the provided policy context. "
+                    "Do not disclose confidential PII or internal system tokens."
+                )
+                gemini_resp = self.gemini_client.models.generate_content(
+                    model=GEMINI_MODEL,
+                    contents=f"Policy Context:\n{policy_res.get('text', answer_text)}\n\nEmployee Query: {sanitized_prompt}",
+                    config={"system_instruction": system_prompt, "temperature": 0.0},
+                )
+                if gemini_resp and gemini_resp.text:
+                    answer_text = gemini_resp.text.strip()
+            except Exception:
+                pass  # Fall back gracefully to deterministic retrieved policy answer
+
         return {
             "status": "SUCCESS",
             "intent": "UC-1.1_POLICY_QA",
-            "response": mask_spii(policy_res["answer"]),
+            "response": mask_spii(answer_text),
             "citation": policy_res.get("citation"),
             "deep_link": policy_res.get("deep_link"),
             "tool_calls": ["query_policy"],
