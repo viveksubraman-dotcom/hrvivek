@@ -37,4 +37,4 @@ def health():
 def chat(req: ChatRequest):
     orchestrator = get_orchestrator()
     res = orchestrator.process_message(req.prompt)
-    return res\n
+    return res
