@@ -61,4 +61,3 @@ dataset_paths:
   single_turn: tests/eval/datasets/eval-single-turn.json
   multi_turn: tests/eval/datasets/eval-multi-turn.json
   mcp_integration: tests/eval/datasets/eval-mcp-integration.json
-  golden_matrix: tests/eval/datasets/golden_mas_eval.evalset.json

@@ -2,8 +2,7 @@
 
 **Evaluation Benchmark Suite:** Enterprise HR Policy & Operational FAQ Benchmark Suite (BRD MVP 1 Baseline)  
 **Evaluated Artifact:** `src/hr_agentic` (Orchestrator, WorkWeek & ServiceImmediately MCP Connectors, Safety Pre-Scan)  
-**Evaluation Configuration:** `tests/eval/eval_config.yaml`  
-**Evaluation Datasets:** `tests/eval/datasets/eval-single-turn.json`, `eval-multi-turn.json`, `eval-mcp-integration.json`, `golden_mas_eval.evalset.json`  
+**Evaluation Datasets:** `tests/eval/datasets/eval-single-turn.json`, `tests/eval/datasets/eval-multi-turn.json`, `tests/eval/datasets/eval-mcp-integration.json`  
 **Overall Execution Status:** `PASSED`
 
 ---
