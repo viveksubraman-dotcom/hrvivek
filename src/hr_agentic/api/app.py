@@ -37,8 +37,27 @@ def health():
 def chat(req: ChatRequest):
     orchestrator = get_orchestrator()
     claims = UserClaims(user_id=req.user_id or "EMP-90210", user_email=f"{req.user_id or 'EMP-90210'}@altostrat.com")
-    res = orchestrator.process_message(req.prompt, user=claims)
-    return res
+    try:
+        res = orchestrator.process_message(req.prompt, user=claims)
+        return res
+    except Exception as e:
+        return {
+            "status": "ERROR",
+            "category": "VALIDATION_ERROR",
+            "response": str(e),
+            "tool_calls": []
+        }
+
+@app.post("/api/v1/reset")
+def reset_state():
+    get_orchestrator().reset()
+    from ..connectors.workweek import get_workweek_client
+    from ..connectors.service_immediately import get_service_immediately_client
+    from ..saga.coordinator import get_saga_coordinator
+    get_workweek_client().reset()
+    get_service_immediately_client().reset()
+    get_saga_coordinator().reset()
+    return {"status": "RESET_COMPLETE"}
 
 class FeedbackRequest(BaseModel):
     score: int

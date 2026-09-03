@@ -207,14 +207,23 @@ class HRAgenticOrchestrator:
             }
 
         if "medical leave" in p_lower or ("sick leave" in p_lower and "access" in p_lower):
-            res = execute_medical_leave_saga(user_claims.user_id, start_date="2026-09-07", days=10)
-            return {
-                "status": "SUCCESS",
-                "intent": "UC-2.2_MEDICAL_LEAVE",
-                "response": mask_spii(res["message"]),
-                "details": res,
-                "tool_calls": ["query_hr_policy", "submit_leave_request", "get_employee_profile", "create_incident_ticket"]
-            }
+            try:
+                res = execute_medical_leave_saga(user_claims.user_id, start_date="2026-09-07", days=10)
+                return {
+                    "status": "SUCCESS",
+                    "intent": "UC-2.2_MEDICAL_LEAVE",
+                    "response": mask_spii(res["message"]),
+                    "details": res,
+                    "tool_calls": ["query_hr_policy", "submit_leave_request", "get_employee_profile", "create_incident_ticket"]
+                }
+            except Exception as e:
+                return {
+                    "status": "FAILED_BUSINESS_RULE",
+                    "intent": "UC-2.2_MEDICAL_LEAVE",
+                    "response": f"Unable to process medical leave: {str(e)}",
+                    "error": str(e),
+                    "tool_calls": ["query_hr_policy"]
+                }
 
         if "transfer" in p_lower and "london" in p_lower or ("relocation" in p_lower and "allowance" in p_lower):
             res = execute_relocation_saga(user_claims.user_id)
