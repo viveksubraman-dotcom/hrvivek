@@ -34,7 +34,6 @@
     .card-base:hover {
       border-color: #334155;
     }
-    /* Clean scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -50,7 +49,7 @@
 </head>
 <body class="min-h-screen bg-[#090d16] text-slate-100 flex flex-col justify-between antialiased selection:bg-sky-500 selection:text-black">
 
-  <!-- TOP APP BAR (Cleaned: No timer, no buying committee) -->
+  <!-- TOP APP BAR -->
   <header class="h-16 border-b border-slate-800 bg-[#0c121e] px-8 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center font-bold text-black text-sm">
@@ -62,13 +61,13 @@
       </div>
     </div>
 
-    <!-- CLEAN SLIDE NAVIGATION CONTROLS -->
+    <!-- SLIDE NAVIGATION CONTROLS (8 SLIDES TOTAL) -->
     <div class="flex items-center gap-4">
       <div class="text-xs text-slate-400 font-mono">
         <span>Slide</span>
         <span id="current-slide-num" class="font-bold text-sky-400 text-sm ml-1">1</span>
         <span class="mx-0.5">/</span>
-        <span>9</span>
+        <span>8</span>
       </div>
 
       <div class="flex items-center gap-1.5">
@@ -107,7 +106,6 @@
         </div>
       </div>
 
-      <!-- 4 Core Metric Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div class="card-base rounded-xl p-5 border-l-4 border-l-rose-500">
           <span class="text-xs font-mono uppercase text-slate-400">Monthly Ticket Volume</span>
@@ -146,7 +144,6 @@
         </div>
       </div>
 
-      <!-- Human & Business Impact Callout -->
       <div class="card-base rounded-xl p-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <span class="text-rose-400 font-mono font-bold text-sm">Operational Reality:</span>
@@ -178,7 +175,6 @@
         </div>
       </div>
 
-      <!-- 4 Outcome Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
         <div class="card-base rounded-xl p-4 border-l-4 border-l-emerald-500">
           <span class="text-xs font-mono uppercase text-slate-400">Ticket Deflection</span>
@@ -264,209 +260,98 @@
     </section>
 
     <!-- ==========================================
-         SLIDE 3: SOLUTION SCOPE & OPERATIONAL BOUNDARY
+         SLIDE 3: ENTERPRISE CAPABILITIES & THE "SO WHAT"
+         (CONSOLIDATED FROM OLD SLIDES 3 & 4)
          ========================================== -->
     <section class="slide-page" data-slide="3">
-      <div class="mb-6 flex items-center justify-between border-b border-slate-800 pb-4">
-        <div>
-          <span class="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 bg-sky-950/40 border border-sky-900/50 px-2.5 py-1 rounded">
-            Service Boundaries
-          </span>
-          <h1 class="text-3xl font-extrabold text-white mt-2.5 tracking-tight">
-            Solution Scope: 4 High-Volume Employee Workflows
-          </h1>
-          <p class="text-sm text-slate-400 mt-1">
-            Strict operational boundaries ensure high accuracy execution with seamless human escalation.
-          </p>
-        </div>
-        <div class="text-right hidden sm:block">
-          <span class="text-3xl font-black text-sky-400 font-mono">4 Pillars</span>
-          <p class="text-xs text-slate-400 uppercase font-mono">In-Scope Areas</p>
-        </div>
-      </div>
-
-      <!-- 4 Scope Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div class="card-base rounded-xl p-5 border-l-4 border-l-sky-500">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-bold text-white text-base">1. Tier-1 Policy Deflection</h3>
-            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">Automated</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed mb-3">
-            Instant policy answers with mandatory handbook section citations (`POL-HR-01#sec-1.1`). Covers vacation accruals, medical certificate requirements, and parental leave eligibility.
-          </p>
-          <div class="text-[11px] text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800">
-            • 48-hour MC grace window for prolonged illness<br>
-            • Verifiable inline policy citations in every response
-          </div>
-        </div>
-
-        <div class="card-base rounded-xl p-5 border-l-4 border-l-sky-500">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-bold text-white text-base">2. Multi-Policy Knowledge Synthesis</h3>
-            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">Grounded</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed mb-3">
-            Synthesizes cross-departmental policies into unified advisories. E.g., London relocation combining tax withholding, visa checklists, and moving allowances without policy contradictions.
-          </p>
-          <div class="text-[11px] text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800">
-            • Cross-jurisdiction compliance synthesis<br>
-            • Zero policy ambiguity or contradictory guidance
-          </div>
-        </div>
-
-        <div class="card-base rounded-xl p-5 border-l-4 border-l-sky-500">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-bold text-white text-base">3. Autonomous Hardware Provisioning</h3>
-            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">SaaS Action</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed mb-3">
-            Validates $1,500 equipment stipends (`POL-IT-02`), demotes inflated peripheral requests to P4 Low, and initiates auto-provisioning or manager approval workflows.
-          </p>
-          <div class="text-[11px] text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800">
-            • Priority anti-inflation: Peripheral P1 demoted to P4 Low<br>
-            • Auto-routes manager approval if exceeding $1,500
-          </div>
-        </div>
-
-        <div class="card-base rounded-xl p-5 border-l-4 border-l-sky-500">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-bold text-white text-base">4. Statutory Leave Management Sagas</h3>
-            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">Transactional</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed mb-3">
-            Submits leave in Workday while creating coverage tickets in ServiceNow via Two-Phase Saga coordination with Firestore Write-Ahead Logging and compensating rollbacks.
-          </p>
-          <div class="text-[11px] text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800">
-            • Calendar engine excludes weekends & public holidays<br>
-            • Compensating rollback prevents orphaned leave records
-          </div>
-        </div>
-      </div>
-
-      <!-- Out-of-Scope Safety Gate -->
-      <div class="card-base rounded-xl p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-sky-400 font-mono font-bold text-xs">Deterministic Safety Boundary:</span>
-          <span class="text-xs text-slate-300">Harassment reporting, disciplinary actions, and compensation adjustments immediately route to Human HRBPs with full conversation context.</span>
-        </div>
-        <span class="text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2.5 py-1 rounded">100% Safe Escalation</span>
-      </div>
-    </section>
-
-    <!-- ==========================================
-         SLIDE 4: BUSINESS REQUIREMENTS TRACEABILITY
-         ========================================== -->
-    <section class="slide-page" data-slide="4">
       <div class="mb-5 flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
           <span class="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 bg-sky-950/40 border border-sky-900/50 px-2.5 py-1 rounded">
-            Requirements Traceability
+            Capabilities & Impact
           </span>
           <h1 class="text-3xl font-extrabold text-white mt-2.5 tracking-tight">
-            Requirements Traceability: Built Strictly to BRD Specs
+            Enterprise Scope & Capabilities: The "So What"
           </h1>
           <p class="text-sm text-slate-400 mt-1">
-            Every feature maps directly to `BRD_MVP1.md` Functional and Non-Functional Requirements.
+            Built strictly to BRD specifications: high-volume automation paired with guaranteed enterprise safety.
           </p>
         </div>
         <div class="text-right hidden sm:block">
-          <span class="text-3xl font-black text-sky-400 font-mono">100%</span>
-          <p class="text-xs text-slate-400 uppercase font-mono">BRD Compliance</p>
+          <span class="text-3xl font-black text-sky-400 font-mono">4 Workflows</span>
+          <p class="text-xs text-slate-400 uppercase font-mono">Core Scope</p>
         </div>
       </div>
 
-      <!-- Functional & Non-Functional Columns -->
+      <!-- 2 Columns: What We Automate vs How We Guarantee It -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-        <div class="card-base rounded-xl p-5">
+        <!-- Left: What We Automate -->
+        <div class="card-base rounded-xl p-5 border-l-4 border-l-sky-500">
           <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-            <h3 class="font-bold text-sky-400 text-xs uppercase tracking-wide font-mono">Functional Requirements (FR)</h3>
-            <span class="text-[11px] font-mono text-slate-400">BRD Sections 4.1 – 4.5</span>
+            <h3 class="font-bold text-sky-400 text-xs uppercase tracking-wide font-mono">What We Automate (In-Scope)</h3>
+            <span class="text-[11px] font-mono text-emerald-400">Zero Routine Friction</span>
           </div>
-          <div class="space-y-2.5 text-xs">
+          <div class="space-y-3 text-xs">
             <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
-              <div class="flex justify-between font-mono font-bold text-white mb-0.5">
-                <span>FR-1: Dynamic Tool Calling</span>
-                <span class="text-emerald-400">Verified</span>
-              </div>
-              <p class="text-slate-400">Executes leave queries and ticket creation under enterprise RBAC governance.</p>
+              <div class="font-bold text-white mb-0.5">1. Policy Answers & Section Citations</div>
+              <p class="text-slate-400">Instant answers with direct handbook section citations (`POL-HR-01#sec-1.1`). 48-hour MC grace window for extended illness.</p>
             </div>
             <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
-              <div class="flex justify-between font-mono font-bold text-white mb-0.5">
-                <span>FR-2: Provenance Attribution</span>
-                <span class="text-emerald-400">Verified</span>
-              </div>
-              <p class="text-slate-400">Mandatory audit tags marking every automated write as `AI_HR_AGENT_MVP1`.</p>
+              <div class="font-bold text-white mb-0.5">2. Statutory Leave Booking & Calendar Math</div>
+              <p class="text-slate-400">Submits leave in Workday while creating coverage tickets in ServiceNow. Mathematically excludes company holidays & weekends.</p>
             </div>
             <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
-              <div class="flex justify-between font-mono font-bold text-white mb-0.5">
-                <span>FR-3: Inline Section Citations</span>
-                <span class="text-emerald-400">Verified</span>
-              </div>
-              <p class="text-slate-400">Conversational responses quote exact handbook anchors (`POL-HR-01#sec-1.1`).</p>
-            </div>
-            <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
-              <div class="flex justify-between font-mono font-bold text-white mb-0.5">
-                <span>FR-4 & FR-5: Math & Anti-Inflation</span>
-                <span class="text-emerald-400">Verified</span>
-              </div>
-              <p class="text-slate-400">`calculate_working_days` calendar math; peripheral P1 demotion to P4 Low.</p>
+              <div class="font-bold text-white mb-0.5">3. Hardware Provisioning & Anti-Inflation</div>
+              <p class="text-slate-400">Auto-orders within $1,500 stipend limit (`POL-IT-02`); automatically demotes routine accessories (mouse/monitor) from P1 to P4 Low.</p>
             </div>
           </div>
         </div>
 
-        <div class="card-base rounded-xl p-5">
+        <!-- Right: Enterprise Guarantees -->
+        <div class="card-base rounded-xl p-5 border-l-4 border-l-emerald-500">
           <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-            <h3 class="font-bold text-sky-400 text-xs uppercase tracking-wide font-mono">Non-Functional Requirements (NFR)</h3>
-            <span class="text-[11px] font-mono text-slate-400">BRD Sections 5.1 – 5.4</span>
+            <h3 class="font-bold text-emerald-400 text-xs uppercase tracking-wide font-mono">Enterprise Guarantees (The Standards)</h3>
+            <span class="text-[11px] font-mono text-slate-400">Non-Negotiable SLAs</span>
           </div>
-          <div class="space-y-2.5 text-xs">
+          <div class="space-y-3 text-xs">
             <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
-              <div class="flex justify-between font-mono font-bold text-white mb-0.5">
-                <span>NFR-1: Latency Budget</span>
-                <span class="text-sky-400">&lt; 3.5s MTTR</span>
+              <div class="flex justify-between font-bold text-white mb-0.5">
+                <span>Speed to Resolution</span>
+                <span class="text-emerald-400 font-mono">&lt; 3.5s MTTR</span>
               </div>
-              <p class="text-slate-400">Sub-second TTFT via Gemini 3.5 Flash; in-process security scan in 0.04ms.</p>
+              <p class="text-slate-400">Sub-second Time-to-First-Token via Gemini 3.5 Flash; in-process security scan in 0.04ms.</p>
             </div>
             <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
-              <div class="flex justify-between font-mono font-bold text-white mb-0.5">
-                <span>NFR-2: Zero-Trust Security</span>
-                <span class="text-sky-400">IAP / OIDC</span>
+              <div class="flex justify-between font-bold text-white mb-0.5">
+                <span>Zero-Trust Security & Privacy</span>
+                <span class="text-emerald-400 font-mono">Google SAIF</span>
               </div>
-              <p class="text-slate-400">Edge authentication via Cloud IAP; OIDC token signature verified against IdP JWKS.</p>
+              <p class="text-slate-400">Edge Cloud IAP authentication, in-memory DLP for NRIC/health data, and contractual zero retention on Vertex AI.</p>
             </div>
             <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
-              <div class="flex justify-between font-mono font-bold text-white mb-0.5">
-                <span>NFR-3: High Availability</span>
-                <span class="text-sky-400">99.9% SLA</span>
+              <div class="flex justify-between font-bold text-white mb-0.5">
+                <span>Deterministic Escalation</span>
+                <span class="text-emerald-400 font-mono">100% Safe Gate</span>
               </div>
-              <p class="text-slate-400">Cloud Run serverless auto-scaling 0-to-N; Firestore multi-region state replication.</p>
-            </div>
-            <div class="p-2.5 rounded bg-slate-950 border border-slate-800">
-              <div class="flex justify-between font-mono font-bold text-white mb-0.5">
-                <span>NFR-4: Data Privacy & DLP</span>
-                <span class="text-sky-400">Zero Retention</span>
-              </div>
-              <p class="text-slate-400">In-memory NRIC/PHI redaction; contractual zero data retention on Vertex AI.</p>
+              <p class="text-slate-400">Sensitive cases (harassment, disciplinary, salary) route immediately to Human HRBPs with full conversation context.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Commercial Benchmark Gate -->
-      <div class="card-base rounded-xl p-3.5 flex items-center justify-between text-xs">
-        <span class="font-mono text-slate-400">BRD Section 7 Commercial Benchmarks:</span>
-        <span class="text-emerald-400 font-bold">&ge;40% Initial Deflection</span>
-        <span class="text-sky-400 font-bold">&lt;3.5s Avg Resolution</span>
-        <span class="text-white font-bold">&lt;2.0% Re-Open Rate</span>
-        <span class="text-emerald-400 font-mono font-bold bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded">All Targets Exceeded</span>
+      <!-- The "So What" Value Strip -->
+      <div class="card-base rounded-xl p-4 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-3">
+          <span class="text-emerald-400 font-mono font-bold">The "So What" for Leadership:</span>
+          <span class="text-slate-300">Reclaims <strong>1,250 hours monthly</strong> for strategic talent development while eradicating payroll disputes with <strong>99.8% verified policy accuracy</strong>.</span>
+        </div>
+        <span class="text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2.5 py-1 rounded">Proven Business ROI</span>
       </div>
     </section>
 
     <!-- ==========================================
-         SLIDE 5: LOGICAL ARCHITECTURE (DETAILED TIERS)
+         SLIDE 4: LOGICAL ARCHITECTURE (WAS SLIDE 5)
          ========================================== -->
-    <section class="slide-page" data-slide="5">
+    <section class="slide-page" data-slide="4">
       <div class="mb-4 flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
           <span class="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 bg-sky-950/40 border border-sky-900/50 px-2.5 py-1 rounded">
@@ -594,9 +479,9 @@
     </section>
 
     <!-- ==========================================
-         SLIDE 6: THE OKF TRI-HYBRID BRAIN
+         SLIDE 5: THE OKF TRI-HYBRID BRAIN (WAS SLIDE 6)
          ========================================== -->
-    <section class="slide-page" data-slide="6">
+    <section class="slide-page" data-slide="5">
       <div class="mb-5 flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
           <span class="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 bg-sky-950/40 border border-sky-900/50 px-2.5 py-1 rounded">
@@ -615,7 +500,6 @@
         </div>
       </div>
 
-      <!-- 3 Search Pillars -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
         <div class="card-base rounded-xl p-4 border-l-4 border-l-sky-500">
           <div class="flex items-center gap-2 mb-2">
@@ -651,7 +535,6 @@
         </div>
       </div>
 
-      <!-- Concrete Policy Decision Showcase -->
       <div class="card-base rounded-xl p-4">
         <div class="flex items-center justify-between mb-2">
           <div class="text-xs font-mono font-bold text-sky-300 uppercase tracking-wider">
@@ -686,9 +569,9 @@
     </section>
 
     <!-- ==========================================
-         SLIDE 7: ENTERPRISE SECURITY, IDENTITY & PRIVACY
+         SLIDE 6: SECURITY & GOVERNANCE (WAS SLIDE 7)
          ========================================== -->
-    <section class="slide-page" data-slide="7">
+    <section class="slide-page" data-slide="6">
       <div class="mb-5 flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
           <span class="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 bg-sky-950/40 border border-sky-900/50 px-2.5 py-1 rounded">
@@ -707,7 +590,6 @@
         </div>
       </div>
 
-      <!-- 4 Security Pillars -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
         <div class="card-base rounded-xl p-4 border-l-4 border-l-sky-500">
           <div class="text-xs font-mono font-bold text-sky-400 uppercase">1. Zero-Trust Identity</div>
@@ -742,7 +624,6 @@
         </div>
       </div>
 
-      <!-- Compliance & Kill Switch Strip -->
       <div class="card-base rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-sm">🛑</span>
@@ -760,9 +641,9 @@
     </section>
 
     <!-- ==========================================
-         SLIDE 8: PHASED ADOPTION ROADMAP
+         SLIDE 7: PHASED ADOPTION ROADMAP (WAS SLIDE 8)
          ========================================== -->
-    <section class="slide-page" data-slide="8">
+    <section class="slide-page" data-slide="7">
       <div class="mb-5 flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
           <span class="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 bg-sky-950/40 border border-sky-900/50 px-2.5 py-1 rounded">
@@ -781,7 +662,6 @@
         </div>
       </div>
 
-      <!-- 4 Phased Milestones Grid -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div class="card-base rounded-xl p-4 border-l-4 border-l-slate-600">
           <div class="text-xs font-mono text-slate-400 font-bold">Weeks 1–2</div>
@@ -820,7 +700,6 @@
         </div>
       </div>
 
-      <!-- Success Gate Callout -->
       <div class="card-base rounded-xl p-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <span class="text-sky-400 font-mono font-bold text-xs">Pilot Success Criteria:</span>
@@ -831,9 +710,9 @@
     </section>
 
     <!-- ==========================================
-         SLIDE 9: THANK YOU & STRATEGIC NEXT STEPS
+         SLIDE 8: THANK YOU & STRATEGIC NEXT STEPS (WAS SLIDE 9)
          ========================================== -->
-    <section class="slide-page" data-slide="9">
+    <section class="slide-page" data-slide="8">
       <div class="max-w-3xl mx-auto text-center py-8">
         <div class="w-14 h-14 rounded-2xl bg-sky-500 mx-auto flex items-center justify-center font-black text-black text-2xl mb-5">
           E
@@ -880,9 +759,8 @@
 
   </main>
 
-  <!-- BOTTOM NAVIGATION DOCK (Cleaned: 9 Pills, No Clutter) -->
+  <!-- BOTTOM NAVIGATION DOCK (8 SLIDES) -->
   <footer class="h-14 border-t border-slate-800 bg-[#0c121e] px-8 flex items-center justify-between">
-    <!-- Slide Progress Pills -->
     <div class="flex items-center gap-1.5 overflow-x-auto py-1" id="slide-pills-container">
       <!-- Generated dynamically in JS -->
     </div>
@@ -894,9 +772,8 @@
 
   <!-- INTERACTIVE SCRIPTS -->
   <script>
-    // Slide Controller State
     let currentSlide = 1;
-    const totalSlides = 9;
+    const totalSlides = 8;
     const slides = document.querySelectorAll('.slide-page');
     const slideNumDisplay = document.getElementById('current-slide-num');
     const pillsContainer = document.getElementById('slide-pills-container');
@@ -946,7 +823,7 @@
       }
     });
 
-    // Interactive ROI Calculator Logic
+    // ROI Calculator Logic
     const sliderTickets = document.getElementById('slider-tickets');
     const sliderCost = document.getElementById('slider-cost');
     const sliderDeflection = document.getElementById('slider-deflection');
@@ -987,7 +864,6 @@
       sliderDeflection.oninput = updateROI;
     }
 
-    // Initialize UI
     buildPills();
     updateROI();
   </script>
